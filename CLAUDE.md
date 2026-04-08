@@ -1,1 +1,13 @@
 @AGENTS.md
+
+# Project rules
+
+- **Always download my assets as SVG and use them.** When implementing a Figma screen, pull every icon/logo/image through the Figma MCP and save it into `public/images/<screen>/`. Do NOT recreate icons as inline JSX SVG paths — use the downloaded files. For single-color UI icons, tint them via CSS `mask-image` + `background-color: currentColor` (see `lib/icons.tsx` for the `MaskIcon` pattern). For multi-color brand/verified icons, render them as plain `<img>`.
+
+- **Don't complicate the build.** No new dependencies unless absolutely required. No build-time codegen, no SVGR, no complex Tailwind plugin chains. Stay on the existing Next.js + Tailwind v4 stack. If a task can be done with a few lines of CSS or an inline style, prefer that over adding tooling.
+
+- **Components over repetition.** Shared UI (tab bar, nav bar, status bar, list cards, chip rows, section headers, etc.) must live as reusable components under `components/profile/` (or a sibling folder per screen). A new screen must reuse existing components instead of copy-pasting markup. If two screens have slightly different variants of the same thing, extend the component with props — don't fork it.
+
+- **Only two font families: Inter and National 2 Narrow.** Use `Inter` (via `next/font/google`, CSS variable `--font-inter`) for all body, UI, headings, buttons. Use `National 2 Narrow` (Klim Type Foundry, loaded as a local font from `public/fonts/`, CSS variable `--font-narrow`) only for narrow display text where the Figma explicitly calls for it (e.g. the Kenzie Foster name pill in the invite sheet). Never introduce a third font — not even for a heading style or brand name. If a Figma node calls for a different font, map it to one of these two.
+
+- **Never break the iPhone rounded-corner clip.** The iPhone screen area is clipped by `border-radius: 55 + overflow: hidden` in `components/IPhoneFrame.tsx`. WebKit/Safari has a long-standing bug where children with `transform:` (our sliding tab panels, pushed views in `AppShell`, animated sheets) escape that clip and poke square corners through the PNG cutout. The fix — already applied on the IPhoneFrame screen container — is `isolation: isolate` + `mask-image: radial-gradient(...)`. **Do not remove these properties.** When adding new screens that use `transform` for slide/push/sheet animations, make sure they render INSIDE the IPhoneFrame screen container (via `AppShell`), not as a sibling, so they inherit that clipping context. If you ever introduce a new top-level clipping container with rounded corners, apply the same `isolation: isolate` + `mask-image: radial-gradient(...)` hack to it.

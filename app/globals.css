@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
+/* ============================================================
+ * Fonts
+ *
+ * Project rule: we use only two font families.
+ *   1. Inter — all body, UI, headers (loaded via next/font/google)
+ *   2. National 2 Narrow — narrow display (Klim Type Foundry)
+ *
+ * National 2 Narrow .otf files live in public/fonts/.
+ * ============================================================ */
+@font-face {
+  font-family: "National 2 Narrow";
+  src: url("/fonts/National2Narrow-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "National 2 Narrow";
+  src: url("/fonts/National2Narrow-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "National 2 Narrow";
+  src: url("/fonts/National2Narrow-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "National 2 Narrow";
+  src: url("/fonts/National2Narrow-Extrabold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-national: "National 2 Narrow", var(--font-inter), "Inter",
+    "Helvetica Neue", Arial, sans-serif;
+  --color-text-base: #1c1c1c;
+  --color-text-medium: #717171;
+  --color-text-inverse: #ffffff;
+  --color-bg-body: #ffffff;
+  --color-bg-weak: #f1f1f1;
+  --color-bg-strong: #1c1c1c;
+  --color-border-subtle: #c6c6c6;
+  --color-border-inverse: #ffffff;
+  --color-input-gray: #ececec;
+  --color-verified-blue: #1877f2;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-text-base: var(--color-text-base);
+  --color-text-medium: var(--color-text-medium);
+  --color-bg-weak: var(--color-bg-weak);
+  --color-bg-strong: var(--color-bg-strong);
+  --color-input-gray: var(--color-input-gray);
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  --font-narrow: var(--font-national);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #e5e5e5;
+  color: var(--color-text-base);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbars but keep scroll functionality (used by iOS chip rows) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* iOS-like momentum scroll + contain page bleed */
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Seamless horizontal brand carousel — the track contains two copies
+   of the strip separated by a 7px gap; animate by exactly one strip
+   width + gap so the wrap is visually continuous.
+   Strip native 1624×302 rendered at height 155px → browser-computed
+   width is 834px. Wrap distance = 834 + (-4) = 830px (copies overlap
+   by 4px via negative margin on the second strip). */
+@layer utilities {
+  @keyframes brand-scroll {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-830px, 0, 0);
+    }
+  }
+  .brand-scroll {
+    animation: brand-scroll 40s linear infinite;
+    will-change: transform;
+  }
 }
