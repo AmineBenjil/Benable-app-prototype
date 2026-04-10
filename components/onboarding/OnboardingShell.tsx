@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { StatusBar } from "@/components/profile/StatusBar";
 
 type OnboardingShellProps = {
   title: string;
@@ -7,7 +6,7 @@ type OnboardingShellProps = {
   progress: number;
   onBack: () => void;
   children: ReactNode;
-  /** Optional sticky primary CTA rendered above the home indicator */
+  /** Optional sticky primary CTA rendered at the bottom of the shell */
   cta?: ReactNode;
   /** Optional body background color (defaults to white) */
   bodyBackground?: string;
@@ -16,11 +15,10 @@ type OnboardingShellProps = {
 /**
  * Reusable shell for every onboarding step.
  * Matches Figma node 7341:71944 ("Onboarding - 436"):
- *  - Status bar
+ *  - (Status bar + home indicator are drawn persistently by AppShell)
  *  - Header (48h): back arrow, centered title, hairline divider, progress bar
  *  - Body slot
  *  - Optional sticky CTA
- *  - Home indicator
  */
 export function OnboardingShell({
   title,
@@ -35,10 +33,9 @@ export function OnboardingShell({
       className="relative flex h-full w-full flex-col"
       style={{ backgroundColor: bodyBackground }}
     >
-      {/* Opaque white bar behind the status bar so the off-white body
-          background doesn't tint the status bar icons' area. */}
+      {/* Opaque white bar behind the (persistent AppShell-level) status
+          bar so the off-white body background doesn't tint the icons. */}
       <div className="absolute left-0 right-0 top-0 z-30 h-[54px] bg-white" />
-      <StatusBar />
 
       {/* Header */}
       <header className="relative mt-[54px] h-[48px] w-full bg-white">
@@ -84,23 +81,17 @@ export function OnboardingShell({
         {children}
       </div>
 
-      {/* Sticky CTA */}
+      {/* Sticky CTA. 21px of breathing room below reserves the same
+          space the old in-shell home indicator took so layouts aren't
+          cramped by the persistent AppShell-level pill. */}
       {cta && (
         <div
-          className="relative w-full p-4"
+          className="relative w-full px-4 pt-4 pb-[25px]"
           style={{ backgroundColor: bodyBackground }}
         >
           {cta}
         </div>
       )}
-
-      {/* Home indicator */}
-      <div
-        className="flex h-[21px] w-full items-center justify-center"
-        style={{ backgroundColor: bodyBackground }}
-      >
-        <div className="h-[5px] w-[134px] rounded-full bg-black" />
-      </div>
     </div>
   );
 }

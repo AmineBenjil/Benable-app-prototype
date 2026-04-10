@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigation } from "@/components/AppShell";
+import { Sheet } from "@/components/ui/Sheet";
 import {
   BookmarkIcon,
   BrandCollabsIcon,
@@ -60,92 +61,63 @@ export function MenuSheet({ open, onClose }: MenuSheetProps) {
   const onDashboard = panel === "dashboard";
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-50">
-      {/* Backdrop */}
-      <div
-        className={`absolute inset-0 bg-[#1c1c1c] transition-opacity duration-500 ease-out ${
-          open ? "opacity-60" : "opacity-0"
-        }`}
-        style={{ pointerEvents: open ? "auto" : "none" }}
-        onClick={onClose}
-      />
-
-      {/* Sheet */}
-      <div
-        className="absolute bottom-0 left-0 right-0 rounded-t-[32px] bg-white transition-transform duration-500 ease-[cubic-bezier(.22,.61,.36,1)]"
-        style={{
-          pointerEvents: open ? "auto" : "none",
-          transform: open ? "translateY(0)" : "translateY(100%)",
-        }}
-      >
-        {/* Drag handle */}
-        <div className="flex justify-center pb-3 pt-2">
-          <div className="h-[5px] w-[40px] rounded-full bg-[#d4d4d4]" />
-        </div>
-
-        {/* Header — back button fades in, title swaps instantly */}
-        <div className="relative flex h-7 items-center justify-center">
-          <button
-            type="button"
-            onClick={() => setPanel("main")}
-            className={`absolute left-5 flex h-6 w-6 items-center justify-center text-[#1c1c1c] transition-opacity duration-200 ${
-              onDashboard ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-            aria-label="Back"
-          >
-            <ChevronLeftIcon size={24} />
-          </button>
-
-          <span className="text-[14px] font-bold uppercase leading-5 text-black">
-            {title}
-          </span>
-        </div>
-
-        {/* ── Sliding panels ─────────────────────────────────── */}
-        {/*
-          Both panels sit in an overflow-hidden wrapper.
-          Main panel: in-flow → sets the container height.
-          Dashboard panel: absolute, same height → slides in/out on top.
-          No height animation needed — both have equal content rows.
-        */}
-        <div className="relative overflow-hidden">
-          {/* Main menu */}
-          <div
-            className={SLIDE}
-            style={{
-              transform: onDashboard ? "translateX(-100%)" : "translateX(0)",
+    <Sheet
+      open={open}
+      onClose={onClose}
+      backdropColor="rgba(28, 28, 28, 0.6)"
+      showGrabber
+      shadow={false}
+      headerHeight={58}
+      title={title}
+      leftAction={
+        onDashboard
+          ? {
+              icon: <ChevronLeftIcon size={24} />,
+              onPress: () => setPanel("main"),
+              ariaLabel: "Back",
+            }
+          : undefined
+      }
+    >
+      {/* ── Sliding panels ─────────────────────────────────── */}
+      {/*
+        Both panels sit in an overflow-hidden wrapper.
+        Main panel: in-flow → sets the container height.
+        Dashboard panel: absolute, same height → slides in/out on top.
+        No height animation needed — both have equal content rows.
+      */}
+      <div className="relative overflow-hidden">
+        {/* Main menu */}
+        <div
+          className={SLIDE}
+          style={{
+            transform: onDashboard ? "translateX(-100%)" : "translateX(0)",
+          }}
+        >
+          <ItemList
+            items={MAIN_ITEMS}
+            onItemClick={(item) => {
+              if (item.panel) {
+                setPanel(item.panel);
+              } else if (item.navigate) {
+                onClose();
+                navigate(item.navigate);
+              }
             }}
-          >
-            <ItemList
-              items={MAIN_ITEMS}
-              onItemClick={(item) => {
-                if (item.panel) {
-                  setPanel(item.panel);
-                } else if (item.navigate) {
-                  onClose();
-                  navigate(item.navigate);
-                }
-              }}
-            />
-          </div>
-
-          {/* Dashboard sub-menu */}
-          <div
-            className={`absolute inset-0 ${SLIDE}`}
-            style={{
-              transform: onDashboard ? "translateX(0)" : "translateX(100%)",
-            }}
-          >
-            <ItemList items={DASHBOARD_ITEMS} />
-          </div>
+          />
         </div>
 
-        {/* Home indicator */}
-        <div className="flex h-[21px] items-center justify-center">
-          <div className="h-[5px] w-[134px] rounded-full bg-black" />
+        {/* Dashboard sub-menu */}
+        <div
+          className={`absolute inset-0 ${SLIDE}`}
+          style={{
+            transform: onDashboard ? "translateX(0)" : "translateX(100%)",
+          }}
+        >
+          <ItemList items={DASHBOARD_ITEMS} />
         </div>
       </div>
-    </div>
+    </Sheet>
   );
 }
 

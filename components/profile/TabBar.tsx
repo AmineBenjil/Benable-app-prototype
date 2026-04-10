@@ -79,10 +79,9 @@ export function TabBar() {
           </button>
         ))}
       </nav>
-      {/* Home indicator */}
-      <div className="flex h-[21px] items-center justify-center">
-        <div className="h-[5px] w-[134px] rounded-full bg-black" />
-      </div>
+      {/* 21px of breathing room below the tab row — the iOS home
+          indicator itself is drawn persistently by AppShell on top. */}
+      <div className="h-[21px]" />
     </div>
   );
 }

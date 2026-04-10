@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Sheet } from "@/components/ui/Sheet";
 import { Brand } from "@/lib/brandData";
 
 type BrandSheetProps = {
@@ -67,42 +68,38 @@ export function BrandSheet({
     );
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-black/0 transition-[background-color] duration-300"
-        style={{
-          pointerEvents: open ? "auto" : "none",
-          backgroundColor: open ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0)",
-          zIndex: 60,
-        }}
-        onClick={onClose}
-      />
-
-      {/* Sheet panel */}
-      <div
-        className="absolute bottom-0 left-0 right-0 flex flex-col bg-white"
-        style={{
-          height: "82%",
-          borderRadius: "24px 24px 0 0",
-          zIndex: 61,
-          transform: open ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 380ms cubic-bezier(.22,.61,.36,1)",
-          willChange: "transform",
-        }}
-      >
-        {/* Drag handle */}
-        <div className="flex shrink-0 justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-[#d9d9d9]" />
+    <Sheet
+      open={open}
+      onClose={onClose}
+      height="82%"
+      backdropColor="rgba(0, 0, 0, 0.35)"
+      zIndex={60}
+      title={title}
+      showGrabber
+      shadow={false}
+      footer={
+        <div className="p-4 pb-6">
+          <button
+            type="button"
+            onClick={() => onDone(localSelected)}
+            disabled={localSelected.length === 0}
+            className="w-full rounded-[14px] py-4 text-[16px] font-semibold transition-colors"
+            style={{
+              backgroundColor:
+                localSelected.length > 0 ? "#7a5cfa" : "#edeaf9",
+              color: localSelected.length > 0 ? "#fff" : "rgba(122,92,250,0.3)",
+            }}
+          >
+            {localSelected.length > 0
+              ? `Done (${localSelected.length})`
+              : "Done"}
+          </button>
         </div>
-
-        {/* Title */}
-        <h2 className="shrink-0 px-4 pt-2 pb-3 text-[16px] font-semibold text-[#1c1c1c]">
-          {title}
-        </h2>
-
+      }
+    >
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Search */}
-        <div className="shrink-0 px-4 pb-3">
+        <div className="shrink-0 px-4 pt-2 pb-3">
           <div className="flex items-center gap-2 rounded-[12px] bg-[#f5f5f5] px-3 py-2.5">
             <span
               aria-hidden
@@ -206,25 +203,7 @@ export function BrandSheet({
           )}
         </div>
 
-        {/* Sticky Done CTA */}
-        <div className="shrink-0 p-4 pb-6">
-          <button
-            type="button"
-            onClick={() => onDone(localSelected)}
-            disabled={localSelected.length === 0}
-            className="w-full rounded-[14px] py-4 text-[16px] font-semibold transition-colors"
-            style={{
-              backgroundColor:
-                localSelected.length > 0 ? "#7a5cfa" : "#edeaf9",
-              color: localSelected.length > 0 ? "#fff" : "rgba(122,92,250,0.3)",
-            }}
-          >
-            {localSelected.length > 0
-              ? `Done (${localSelected.length})`
-              : "Done"}
-          </button>
-        </div>
       </div>
-    </>
+    </Sheet>
   );
 }

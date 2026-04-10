@@ -1,5 +1,14 @@
 @AGENTS.md
 
+# Context files (read these before scanning the codebase)
+
+- **File map:** `.claude/context/file-map.md` — where everything lives. Read this instead of listing directories or grepping blindly.
+- **Architecture:** `.claude/context/architecture.md` — rendering model, state, navigation, the clip hack.
+- **Decisions log:** `.claude/sessions/decisions.md` — running record of architectural decisions. Read before proposing structural changes.
+- **Latest session:** the most recent file in `.claude/sessions/` (if any) — recap of what was done last time.
+
+At the end of a session, append today's summary to `.claude/sessions/YYYY-MM-DD.md` and add any new architectural decisions to `.claude/sessions/decisions.md`.
+
 # Project rules
 
 - **Always download my assets as SVG and use them.** When implementing a Figma screen, pull every icon/logo/image through the Figma MCP and save it into `public/images/<screen>/`. Do NOT recreate icons as inline JSX SVG paths — use the downloaded files. For single-color UI icons, tint them via CSS `mask-image` + `background-color: currentColor` (see `lib/icons.tsx` for the `MaskIcon` pattern). For multi-color brand/verified icons, render them as plain `<img>`.

@@ -15,8 +15,11 @@ const COLLAPSED_W = 64;
  * Matches Figma node 96:6 (404 × 834, bg #f3f3f3).
  */
 export function DevPanel() {
-  const { flags, toggleFlag } = useDevFlags();
+  const { flags, toggleFlag, currentView } = useDevFlags();
   const [collapsed, setCollapsed] = useState(false);
+
+  const isOnProfile = currentView === "profile";
+  const isOnMenuCampaigns = currentView === "menu-campaigns";
 
   return (
     <aside
@@ -51,18 +54,41 @@ export function DevPanel() {
 
         {/* Settings card — matches Figma bg-[#e8e8e8] rounded-[8px] */}
         <div className="mx-[14px] mt-4 flex flex-col rounded-[8px] bg-[#e8e8e8] py-3">
-          <div className="flex flex-col gap-2 px-5">
-            <SettingRow
-              title="Brand collab flow"
-              description="Enable or disable applying for brand collab"
-              control={
-                <ToggleSwitch
-                  ariaLabel="Toggle Brand collab flow"
-                  checked={flags.brandClubEnabled}
-                  onChange={() => toggleFlag("brandClubEnabled")}
+          <div className="flex flex-col gap-4 px-5">
+            {/* Brand collab flow — only visible on the profile screen */}
+            {isOnProfile && (
+              <SettingRow
+                title="Brand collab flow"
+                description="Enable or disable applying for brand collab"
+                control={
+                  <ToggleSwitch
+                    ariaLabel="Toggle Brand collab flow"
+                    checked={flags.brandClubEnabled}
+                    onChange={() => toggleFlag("brandClubEnabled")}
+                  />
+                }
+              />
+            )}
+
+            {/* Context-aware: only visible on the menu-campaigns screen */}
+            {isOnMenuCampaigns && (
+              <>
+                <p className="text-[12px] font-bold uppercase tracking-wide text-[#6b6b6b]">
+                  Campaigns Settings
+                </p>
+                <SettingRow
+                  title="Campaigns data"
+                  description="Toggle between empty and populated state"
+                  control={
+                    <ToggleSwitch
+                      ariaLabel="Toggle campaigns data"
+                      checked={flags.mockCampaignsEnabled}
+                      onChange={() => toggleFlag("mockCampaignsEnabled")}
+                    />
+                  }
                 />
-              }
-            />
+              </>
+            )}
           </div>
         </div>
       </div>

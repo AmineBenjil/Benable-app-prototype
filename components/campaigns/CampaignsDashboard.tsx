@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useNavigation } from "@/components/AppShell";
-import { StatusBar } from "@/components/profile/StatusBar";
 
 /* ── MaskIcon helper (single-color SVGs tinted via CSS mask) ──────── */
 function MaskIcon({
@@ -179,10 +178,9 @@ export function CampaignsDashboard() {
       className="relative flex h-full w-full flex-col"
       style={{ backgroundColor: "#f9fafb" }}
     >
-      {/* White bar behind the status bar so the off-white body
-          doesn't tint the status bar area. */}
+      {/* White bar behind the (persistent AppShell-level) status bar so
+          the off-white body doesn't tint the icons. */}
       <div className="absolute left-0 right-0 top-0 z-30 h-[54px] bg-white" />
-      <StatusBar />
 
       {/* Header */}
       <header className="relative mt-[54px] h-[48px] w-full bg-white">
@@ -272,10 +270,9 @@ export function CampaignsDashboard() {
         })}
       </div>
 
-      {/* Home indicator — transparent so it sits over the body background */}
-      <div className="flex h-[21px] w-full shrink-0 items-center justify-center bg-transparent">
-        <div className="h-[5px] w-[139px] rounded-full bg-black" />
-      </div>
+      {/* 21px of breathing room below the content — the iOS home
+          indicator itself is drawn persistently by AppShell on top. */}
+      <div className="h-[21px] w-full shrink-0" />
     </div>
   );
 }

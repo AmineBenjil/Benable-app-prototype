@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { inviteSheet } from "@/lib/sheetData";
 import { useNavigation } from "@/components/AppShell";
+import { Sheet } from "@/components/ui/Sheet";
 import { useDevFlags } from "@/components/devPanel/DevPanelContext";
 
 /**
@@ -35,7 +36,7 @@ export function DelayedInviteDMSheet({ delayMs = 4000 }: { delayMs?: number }) {
  * "Invite DM Sheet" — matches Figma node 7270:18093.
  *
  * Structure:
- *  - 375 × 613 sheet, bottom-aligned above 21px home indicator
+ *  - 375 × 613 sheet, bottom-aligned
  *  - Rounded top 32px, white background, clipped
  *  - Decorative Bg area at top (275h) with brand-logo grid on a pastel
  *    gradient, fading to white
@@ -48,30 +49,14 @@ export function DelayedInviteDMSheet({ delayMs = 4000 }: { delayMs?: number }) {
 export function InviteDMSheet({ open }: { open: boolean }) {
   const { navigate } = useNavigation();
   return (
-    <div
-      aria-hidden={!open}
-      className="pointer-events-none absolute inset-0 z-40"
+    <Sheet
+      open={open}
+      height={613}
+      backdropColor="rgba(28, 28, 28, 0.6)"
+      zIndex={40}
+      shadow={false}
     >
-      {/* Dim overlay */}
-      <div
-        className={`absolute inset-0 bg-[#1c1c1c] transition-opacity duration-500 ease-out ${
-          open ? "opacity-60" : "opacity-0"
-        }`}
-        style={{ pointerEvents: open ? "auto" : "none" }}
-      />
-
-      {/* Sheet — extended 21px downward to cover the home indicator area
-          so the pill sits on the sheet's own white surface (and the
-          TabBar's home indicator strip is fully hidden by the sheet). */}
-      <div
-        className="absolute left-0 right-0 overflow-hidden rounded-t-[32px] bg-white transition-transform duration-500 ease-[cubic-bezier(.22,.61,.36,1)]"
-        style={{
-          bottom: 0,
-          height: 634,
-          pointerEvents: open ? "auto" : "none",
-          transform: open ? "translateY(0)" : "translateY(100%)",
-        }}
-      >
+      <div className="relative flex-1">
         {/* Decorative top area: gradient Bg + looping brand carousel.
             The Bg PNG includes the grabber pill + pastel gradient that
             fades to white at the bottom. The brands strip slides slowly
@@ -179,9 +164,9 @@ export function InviteDMSheet({ open }: { open: boolean }) {
           </ul>
         </div>
 
-        {/* CTA button — pinned above the home indicator. Pushes the
-            Brand Collabs onboarding flow via the AppShell navigation. */}
-        <div className="absolute bottom-[21px] left-0 right-0 p-4">
+        {/* CTA button — pinned at the bottom of the content area. The
+            iOS home indicator is drawn persistently by AppShell on top. */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
           <button
             type="button"
             onClick={() => navigate("onboarding")}
@@ -190,13 +175,7 @@ export function InviteDMSheet({ open }: { open: boolean }) {
             {inviteSheet.cta}
           </button>
         </div>
-
-        {/* Home indicator — drawn on top of the sheet's own white surface
-            so there's no separate white rectangle behind it. */}
-        <div className="absolute bottom-0 left-0 right-0 flex h-[21px] items-center justify-center">
-          <div className="h-[5px] w-[134px] rounded-full bg-black" />
-        </div>
       </div>
-    </div>
+    </Sheet>
   );
 }

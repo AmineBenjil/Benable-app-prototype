@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { collections } from "@/lib/profileData";
-import { StatusBar } from "./StatusBar";
 import { TopBar } from "./TopBar";
 import { ProfileHeader } from "./ProfileHeader";
 import { ListsBar } from "./ListsBar";
@@ -54,9 +53,9 @@ export function ProfileScreen() {
         ))}
       </div>
 
-      {/* Fixed chrome */}
+      {/* Fixed chrome — the iOS status bar is drawn persistently by
+          AppShell above every screen, so it's not mounted here. */}
       <TopBar scrolled={scrolled} onMenuPress={() => setMenuOpen(true)} />
-      <StatusBar />
       <TabBar />
 
       <MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} />

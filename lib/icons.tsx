@@ -16,7 +16,7 @@ type IconProps = {
   style?: CSSProperties;
 };
 
-function MaskIcon({
+export function MaskIcon({
   src,
   size = 24,
   className,

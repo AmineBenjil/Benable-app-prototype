@@ -2,37 +2,10 @@
 
 import { useState } from "react";
 import { useNavigation } from "@/components/AppShell";
-import { StatusBar } from "@/components/profile/StatusBar";
-
-/* ── MaskIcon helper (single-color SVGs tinted via CSS mask) ──────── */
-function MaskIcon({
-  src,
-  size = 16,
-  className,
-}: {
-  src: string;
-  size?: number;
-  className?: string;
-}) {
-  return (
-    <span
-      aria-hidden
-      className={`inline-block shrink-0 bg-current ${className ?? ""}`}
-      style={{
-        width: size,
-        height: size,
-        WebkitMaskImage: `url(${src})`,
-        maskImage: `url(${src})`,
-        WebkitMaskRepeat: "no-repeat",
-        maskRepeat: "no-repeat",
-        WebkitMaskPosition: "center",
-        maskPosition: "center",
-        WebkitMaskSize: "contain",
-        maskSize: "contain",
-      }}
-    />
-  );
-}
+import { useDevFlags } from "@/components/devPanel/DevPanelContext";
+import { CampaignCard } from "@/components/campaigns/CampaignCard";
+import { MOCK_CAMPAIGNS, type Campaign } from "@/lib/campaignData";
+import { MaskIcon } from "@/lib/icons";
 
 /* ── "What to Expect" list ─────────────────────────────────────── */
 const EXPECT_ITEMS = [
@@ -168,21 +141,51 @@ function GenericEmptyState({ message }: { message: string }) {
   );
 }
 
+/* ── Populated list (when mockCampaignsEnabled is ON) ────────────── */
+function CampaignList({
+  campaigns,
+  onCampaignPress,
+}: {
+  campaigns: Campaign[];
+  onCampaignPress: (id: string) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-4 px-4 pb-6 pt-6">
+      {campaigns.map((c) => (
+        <CampaignCard
+          key={c.id}
+          brandLogo={c.brandLogo}
+          brandName={c.brandName}
+          title={c.title}
+          description={c.description}
+          logoFill={c.logoFill}
+          onPress={() => onCampaignPress(c.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
 /* ── Main Dashboard ──────────────────────────────────────────────── */
 export function MenuCampaignsDashboard() {
-  const { navigate } = useNavigation();
+  const { navigate, setSelectedCampaignId } = useNavigation();
+  const { flags } = useDevFlags();
   const [activeTab, setActiveTab] = useState<Tab>("new");
   const activeIndex = TAB_INDEX[activeTab];
+
+  const handleCampaignPress = (id: string) => {
+    setSelectedCampaignId(id);
+    navigate("campaign-detail");
+  };
 
   return (
     <div
       className="relative flex h-full w-full flex-col"
       style={{ backgroundColor: "#f9fafb" }}
     >
-      {/* White bar behind the status bar so the off-white body
-          doesn't tint the status bar area. */}
+      {/* White bar behind the (persistent AppShell-level) status bar so
+          the off-white body doesn't tint the icons. */}
       <div className="absolute left-0 right-0 top-0 z-30 h-[54px] bg-white" />
-      <StatusBar />
 
       {/* Header */}
       <header className="relative mt-[54px] h-[48px] w-full bg-white">
@@ -260,22 +263,30 @@ export function MenuCampaignsDashboard() {
               style={{ transform: `translateX(${offset * 100}%)` }}
               aria-hidden={offset !== 0}
             >
-              {tab.id === "new" && <ActiveEmptyState />}
-              {tab.id === "active" && (
-                <GenericEmptyState message="Your running campaigns will show up here" />
-              )}
-              {tab.id === "finished" && (
-                <GenericEmptyState message="Your completed campaigns will show up here" />
+              {flags.mockCampaignsEnabled ? (
+                <CampaignList
+                  campaigns={MOCK_CAMPAIGNS[tab.id]}
+                  onCampaignPress={handleCampaignPress}
+                />
+              ) : (
+                <>
+                  {tab.id === "new" && <ActiveEmptyState />}
+                  {tab.id === "active" && (
+                    <GenericEmptyState message="Your running campaigns will show up here" />
+                  )}
+                  {tab.id === "finished" && (
+                    <GenericEmptyState message="Your completed campaigns will show up here" />
+                  )}
+                </>
               )}
             </div>
           );
         })}
       </div>
 
-      {/* Home indicator — transparent so it sits over the body background */}
-      <div className="flex h-[21px] w-full shrink-0 items-center justify-center bg-transparent">
-        <div className="h-[5px] w-[139px] rounded-full bg-black" />
-      </div>
+      {/* 21px of breathing room below the content — the iOS home
+          indicator itself is drawn persistently by AppShell on top. */}
+      <div className="h-[21px] w-full shrink-0" />
     </div>
   );
 }
